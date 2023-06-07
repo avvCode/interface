@@ -1,0 +1,30 @@
+<!DOCTYPE mapper
+        PUBLIC "-//mybatis.org//DTD Mapper 3.0//EN"
+        "http://mybatis.org/dtd/mybatis-3-mapper.dtd">
+<mapper namespace="com.vv.api.mapper.UserMapper">
+
+    <resultMap id="BaseResultMap" type="com.vv.api.model.po.User">
+            <id property="id" column="id" jdbcType="INTEGER"/>
+            <result property="userAccount" column="userAccount" jdbcType="VARCHAR"/>
+            <result property="password" column="password" jdbcType="VARCHAR"/>
+            <result property="userSex" column="userSex" jdbcType="CHAR"/>
+            <result property="userAvatar" column="userAvatar" jdbcType="VARCHAR"/>
+            <result property="userPhone" column="userPhone" jdbcType="VARCHAR"/>
+            <result property="userEmail" column="userEmail" jdbcType="VARCHAR"/>
+            <result property="userRole" column="userRole" jdbcType="VARCHAR"/>
+            <result property="accessKey" column="accessKey" jdbcType="VARCHAR"/>
+            <result property="secretKey" column="secretKey" jdbcType="VARCHAR"/>
+            <result property="token" column="token" jdbcType="VARCHAR"/>
+            <result property="isDelete" column="isDelete" jdbcType="TINYINT"/>
+            <result property="createTime" column="createTime" jdbcType="TIMESTAMP"/>
+            <result property="updateTime" column="updateTime" jdbcType="TIMESTAMP"/>
+    </resultMap>
+
+    <sql id="Base_Column_List">
+        id,userAccount,password,
+        userSex,userAvatar,userPhone,
+        userEmail,userRole,accessKey,
+        secretKey,token,isDelete,
+        createTime,updateTime
+    </sql>
+</mapper>
