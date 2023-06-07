@@ -22,19 +22,7 @@ import org.springframework.stereotype.Component;
 @Slf4j
 @Component
 public class SmsHandler {
-    /**
-     * tencent:
-     *   secretId: AKID266xb6PXUDnbEfwzyxpX5QaZO1Tq58zg #腾讯云短信控制台查看
-     *   secretKey: QhmeM24zmQxT2TlxxqbHvQpW5Ys252pQ #腾讯云短信控制台查看
-     *   smsSdkAppId: 1400810585 #腾讯云短信控制台查看
-     *   signName: "走不出的死循环公众号" #腾讯云短信控制台查看
-     *   templateId: 1772075 #腾讯云短信控制台查看
-     *   endpoint: "sms.tencentcloudapi.com"
-     *   region: "ap-guangzhou"
-     *   supplierId: 10
-     *   supplierName: "腾讯云",
-     *   scriptName: "TencentSmsScript"
-     */
+
     @Value("${tencent.secretId}")
     private String secretId;
     @Value("${tencent.secretKey}")
