@@ -3,7 +3,7 @@ package com.vv.common.model.vo;
 /**
  * 错误码
  */
-public enum ErrorCode {
+public enum ResponseCode {
 
     SUCCESS(0, "ok"),
     PARAMS_ERROR(40000, "请求参数错误"),
@@ -30,7 +30,7 @@ public enum ErrorCode {
      */
     private final String message;
 
-    ErrorCode(int code, String message) {
+    ResponseCode(int code, String message) {
         this.code = code;
         this.message = message;
     }

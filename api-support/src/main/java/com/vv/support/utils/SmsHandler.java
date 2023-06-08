@@ -7,6 +7,7 @@ import com.tencentcloudapi.common.profile.HttpProfile;
 import com.tencentcloudapi.sms.v20210111.SmsClient;
 import com.tencentcloudapi.sms.v20210111.models.SendSmsRequest;
 import com.tencentcloudapi.sms.v20210111.models.SendSmsResponse;
+import com.vv.common.model.to.SmsTo;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
@@ -38,7 +39,7 @@ public class SmsHandler {
     @Value("${tencent.signName}")
     private String signName;
 
-    public SendSmsResponse smsSend(String phone,String code) throws TencentCloudSDKException {
+    public SendSmsResponse smsSend(SmsTo smsTo) throws TencentCloudSDKException {
         // 实例化一个请求对象，根据调用的接口和实际情况，可以进一步设置请求参数
         SendSmsRequest req = new SendSmsRequest();
         //利用自己开通的密钥创建一个客户端
@@ -71,10 +72,10 @@ public class SmsHandler {
         /* 模板 ID: 必须填写已审核通过的模板 ID */
         req.setTemplateId(templateId);
         /* 模板参数: 模板参数的个数需要与 TemplateId 对应模板的变量个数保持一致，若无模板参数，则设置为空 */
-        String[] templateParamSet = {code};
+        String[] templateParamSet = {smsTo.getCode()};
         req.setTemplateParamSet(templateParamSet);
         /* 下发手机号码，采用 E.164 标准，+[国家或地区码][手机号]*/
-        String[] phoneNumberSet = {"+86" + phone};
+        String[] phoneNumberSet = {"+86" + smsTo.getPhone()};
         req.setPhoneNumberSet(phoneNumberSet);
 
         SendSmsResponse res = client.SendSms(req);

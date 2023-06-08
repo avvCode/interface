@@ -4,68 +4,77 @@ import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
 import com.baomidou.mybatisplus.annotation.TableId;
 import com.baomidou.mybatisplus.annotation.TableName;
-import lombok.Data;
-
 import java.io.Serializable;
 import java.util.Date;
+import lombok.Data;
 
 /**
  * 
- * @TableName user
+ * @TableName interface
  */
-@TableName(value ="user")
+@TableName(value ="interface")
 @Data
-public class User implements Serializable {
+public class Interface implements Serializable {
     /**
-     * 主键-用户id
+     * 主键-接口id
      */
     @TableId(type = IdType.AUTO)
     private Integer id;
 
     /**
-     * 用户密码
+     * 接口名称
      */
-    private String password;
+    private String name;
 
     /**
-     * 性别 男/女
+     * 接口描述
      */
-    private String userSex;
+    private String description;
 
     /**
-     * 用户头像
+     * 接口地址
      */
-    private String userAvatar;
+    private String url;
 
     /**
-     * 用户电话
+     * 请求方式
      */
-    private String userPhone;
+    private String method;
 
     /**
-     * 用户邮箱/账户
+     * 请求参数
      */
-    private String userEmail;
+    private String requestParams;
 
     /**
-     * 用户角色 user / admin 
+     * 请求头
      */
-    private String userRole;
+    private String requestHeader;
 
     /**
-     * 密钥key
+     * 响应头
      */
-    private String accessKey;
+    private String responseHeader;
 
     /**
-     * secretKey
+     * 接口状态 0-下线 1-上线
      */
-    private String secretKey;
+    private Integer status;
 
     /**
-     * 登录凭证
+     * 接口计费规则
      */
-    private String token;
+    private Double price;
+
+    /**
+     * 接口发布者
+     */
+    private Integer userId;
+
+    /**
+     * 接口库存
+     */
+    private Integer store;
 
     /**
      * 是否删除 0-否 1-是

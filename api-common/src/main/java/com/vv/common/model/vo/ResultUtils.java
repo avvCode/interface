@@ -18,14 +18,18 @@ public class ResultUtils {
         return new BaseResponse<>(0, data, "ok");
     }
 
+    public static <T> BaseResponse <T> success(ResponseCode responseCode,String message){
+        return new BaseResponse<>(responseCode.getCode(),null,message);
+    }
+
     /**
      * 失败
      *
-     * @param errorCode
+     * @param responseCode
      * @return
      */
-    public static BaseResponse error(ErrorCode errorCode) {
-        return new BaseResponse<>(errorCode);
+    public static BaseResponse error(ResponseCode responseCode) {
+        return new BaseResponse<>(responseCode);
     }
 
     /**
@@ -42,10 +46,10 @@ public class ResultUtils {
     /**
      * 失败
      *
-     * @param errorCode
+     * @param responseCode
      * @return
      */
-    public static BaseResponse error(ErrorCode errorCode, String message) {
-        return new BaseResponse(errorCode.getCode(), null, message);
+    public static BaseResponse error(ResponseCode responseCode, String message) {
+        return new BaseResponse(responseCode.getCode(), null, message);
     }
 }

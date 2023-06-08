@@ -21,7 +21,7 @@ public class BaseResponse<T> {
         this(code, data, "");
     }
 
-    public BaseResponse(ErrorCode errorCode) {
-        this(errorCode.getCode(), null, errorCode.getMessage());
+    public BaseResponse(ResponseCode responseCode) {
+        this(responseCode.getCode(), null, responseCode.getMessage());
     }
 }

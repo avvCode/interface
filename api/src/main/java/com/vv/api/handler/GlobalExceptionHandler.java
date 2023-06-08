@@ -1,10 +1,10 @@
-package com.vv.common.handler;
+package com.vv.api.handler;
 
 
 
 import com.vv.common.exception.BusinessException;
 import com.vv.common.model.vo.BaseResponse;
-import com.vv.common.model.vo.ErrorCode;
+import com.vv.common.model.vo.ResponseCode;
 import com.vv.common.model.vo.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;
@@ -26,6 +26,6 @@ public class GlobalExceptionHandler {
     @ExceptionHandler(RuntimeException.class)
     public BaseResponse<?> runtimeExceptionHandler(RuntimeException e) {
         log.error("runtimeException", e);
-        return ResultUtils.error(ErrorCode.SYSTEM_ERROR, e.getMessage());
+        return ResultUtils.error(ResponseCode.SYSTEM_ERROR, e.getMessage());
     }
 }

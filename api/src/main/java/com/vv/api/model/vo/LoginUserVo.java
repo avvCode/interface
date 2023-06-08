@@ -1,28 +1,18 @@
-package com.vv.api.model.dto;
+package com.vv.api.model.vo;
 
-import com.baomidou.mybatisplus.annotation.IdType;
 import com.baomidou.mybatisplus.annotation.TableField;
-import com.baomidou.mybatisplus.annotation.TableId;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-/**
- * 脱敏后的用户
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SafeUser {
+public class LoginUserVo {
     /**
      * 主键-用户id
      */
     private Integer id;
-
-    /**
-     * 用户账户
-     */
-    private String userAccount;
 
     /**
      * 性别 男/女
@@ -48,16 +38,6 @@ public class SafeUser {
      * 用户角色 user / admin
      */
     private String userRole;
-
-    /**
-     * 密钥key
-     */
-    private String accessKey;
-
-    /**
-     * secretKey
-     */
-    private String secretKey;
 
     /**
      * 登录凭证

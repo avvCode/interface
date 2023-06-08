@@ -2,15 +2,23 @@ package com.vv.api.service;
 
 
 import com.baomidou.mybatisplus.extension.service.IService;
-import com.vv.api.model.dto.RegisterUser;
-import com.vv.api.model.dto.SafeUser;
+import com.vv.api.model.dto.LoginByEmailDTO;
+import com.vv.api.model.dto.LoginByPhoneDTO;
+import com.vv.api.model.dto.RegisterUserDTO;
+import com.vv.api.model.dto.SafeUserDTO;
 import com.vv.api.model.po.User;
 
 /**
 * @author vv
 */
 public interface UserService extends IService<User> {
-    SafeUser userRegister(RegisterUser registerUser);
+    long userRegister(RegisterUserDTO registerUserDTO);
 
-    boolean registerPhone(String phone);
+    boolean registerSms(String phone);
+
+    SafeUserDTO loginByEmail(LoginByEmailDTO loginByEmailDTO);
+
+    SafeUserDTO loginByPhone(LoginByPhoneDTO loginByPhoneDTO);
+
+    boolean loginSms(String phone);
 }

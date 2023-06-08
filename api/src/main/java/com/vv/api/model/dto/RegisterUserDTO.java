@@ -10,7 +10,7 @@ import lombok.NoArgsConstructor;
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class RegisterUser {
+public class RegisterUserDTO {
     /**
      * 用户邮箱
      */
