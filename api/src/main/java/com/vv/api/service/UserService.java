@@ -8,6 +8,8 @@ import com.vv.api.model.dto.RegisterUserDTO;
 import com.vv.api.model.dto.SafeUserDTO;
 import com.vv.api.model.po.User;
 
+import javax.servlet.http.HttpServletResponse;
+
 /**
 * @author vv
 */
@@ -16,9 +18,11 @@ public interface UserService extends IService<User> {
 
     boolean registerSms(String phone);
 
-    SafeUserDTO loginByEmail(LoginByEmailDTO loginByEmailDTO);
+    SafeUserDTO loginByEmail(LoginByEmailDTO loginByEmailDTO, HttpServletResponse response);
 
-    SafeUserDTO loginByPhone(LoginByPhoneDTO loginByPhoneDTO);
+    SafeUserDTO loginByPhone(LoginByPhoneDTO loginByPhoneDTO, HttpServletResponse response);
 
     boolean loginSms(String phone);
+
+
 }

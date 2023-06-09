@@ -4,10 +4,12 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+
 @Data
 @AllArgsConstructor
 @NoArgsConstructor
-public class LoginByPhoneDTO {
-    private String userEmail;
+public class LoginByPhoneDTO implements Serializable {
+    private String userPhone;
     private String smsCode;
 }

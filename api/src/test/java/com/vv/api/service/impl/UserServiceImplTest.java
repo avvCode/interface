@@ -37,10 +37,12 @@ class UserServiceImplTest {
         String userEmail = "80141182@qq.com";
         String password = "12345678";
         String confirmPassword = "12345678";
+        String phone ="13286563294";
         registerUserDTO.setUserEmail(userEmail);
         registerUserDTO.setPassword(password);
+        registerUserDTO.setUserPhone(phone);
         registerUserDTO.setConfirmPassword(confirmPassword);
-        registerUserDTO.setSmsCode("1234");
+        registerUserDTO.setSmsCode("01884");
         long l = userService.userRegister(registerUserDTO);
     }
 }

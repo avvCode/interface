@@ -24,15 +24,19 @@ public class RabbitmqListener {
 
     //监听sms队列
     @RabbitListener(queues = {RabbitmqConstant.SMS_QUEUE_NAME})
-    public void receive_sms(SmsTo smsTo,Message message, Channel channel){
+    public void receiveSms(SmsTo smsTo,Message message, Channel channel){
+
         String code = smsTo.getCode();
         String phone = smsTo.getPhone();
+
         //TODO 发送短信
         log.info("发送短信到手机：{},验证码为：{}",phone,code);
         try {
             //手动确认消息
             //塞到Redis里
             redisTemplate.opsForValue().set(RedisConstant.REGISTER_CODE_PREFIX+phone,code);
+
+            //手动确认消息
             channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
         } catch (IOException e) {
             throw new RuntimeException(e);

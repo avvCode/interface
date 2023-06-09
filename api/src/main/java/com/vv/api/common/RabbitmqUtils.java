@@ -23,14 +23,13 @@ public class RabbitmqUtils implements RabbitTemplate.ConfirmCallback, RabbitTemp
 
     public void sendSms(SmsTo smsTo) {
         //使用rabbitTemplate发送消息
-        String message = "send email message to user";
         /**
          * 参数：
          * 1、交换机名称
          * 2、routingKey
          * 3、消息内容
          */
-        rabbitTemplate.convertAndSend(RabbitmqConstant.SMS_EXCHANGE_NAME, RabbitmqConstant.SMS_ROUTING_KET_FOR_REGISTER, message);
+        rabbitTemplate.convertAndSend(RabbitmqConstant.SMS_EXCHANGE_NAME, RabbitmqConstant.SMS_ROUTING_KET_FOR_REGISTER, smsTo);
     }
 
     /**

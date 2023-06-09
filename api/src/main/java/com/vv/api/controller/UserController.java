@@ -12,6 +12,7 @@ import com.vv.common.model.vo.ResultUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletResponse;
 
 @RestController
 @RequestMapping("/user")
@@ -24,11 +25,11 @@ public class UserController {
      * @return
      */
     @PostMapping("/loginByEmail")
-    public BaseResponse loginByEmail(@RequestBody LoginByEmailDTO loginByEmailDTO){
+    public BaseResponse loginByEmail(@RequestBody LoginByEmailDTO loginByEmailDTO, HttpServletResponse response){
         if(loginByEmailDTO == null){
             throw new BusinessException(ResponseCode.PARAMS_ERROR,"请求参数错误");
         }
-        SafeUserDTO safeUserDTO = userService.loginByEmail(loginByEmailDTO);
+        SafeUserDTO safeUserDTO = userService.loginByEmail(loginByEmailDTO,response);
         return ResultUtils.success(safeUserDTO);
     }
 
@@ -36,11 +37,11 @@ public class UserController {
      * 用户通过手机+验证码登录
      */
     @PostMapping("/loginByPhone")
-    public BaseResponse loginByPhone(@RequestBody LoginByPhoneDTO loginByPhoneDTO){
+    public BaseResponse loginByPhone(@RequestBody LoginByPhoneDTO loginByPhoneDTO, HttpServletResponse response){
         if(loginByPhoneDTO == null){
             throw new BusinessException(ResponseCode.PARAMS_ERROR,"请求参数错误");
         }
-        SafeUserDTO safeUserDTO = userService.loginByPhone(loginByPhoneDTO);
+        SafeUserDTO safeUserDTO = userService.loginByPhone(loginByPhoneDTO,response);
         return ResultUtils.success(safeUserDTO);
     }
     /**
@@ -65,7 +66,11 @@ public class UserController {
         if(phone == null){
             throw new BusinessException(ResponseCode.PARAMS_ERROR,"请求参数错误");
         }
+
         boolean b = userService.registerSms(phone);
+        if(!b){
+            return ResultUtils.error(ResponseCode.SYSTEM_ERROR);
+        }
         return ResultUtils.success(ResponseCode.SUCCESS,"发送成功");
     }
     /**
@@ -77,6 +82,9 @@ public class UserController {
             throw new BusinessException(ResponseCode.PARAMS_ERROR,"请求参数错误");
         }
         boolean b = userService.loginSms(phone);
+        if(!b){
+            return ResultUtils.error(ResponseCode.SYSTEM_ERROR);
+        }
         return ResultUtils.success(ResponseCode.SUCCESS,"发送成功");
     }
 

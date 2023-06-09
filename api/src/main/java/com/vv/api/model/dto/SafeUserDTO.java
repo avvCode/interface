@@ -5,13 +5,16 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+import java.util.Date;
+
 /**
  * 脱敏后的用户
  */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SafeUserDTO {
+public class SafeUserDTO implements Serializable {
     /**
      * 主键-用户id
      */
@@ -41,22 +44,19 @@ public class SafeUserDTO {
      * 用户角色 user / admin
      */
     private String userRole;
-
     /**
-     * 密钥key
-     */
-    private String accessKey;
-
-    /**
-     * secretKey
-     */
-    private String secretKey;
-
-    /**
-     * 登录凭证
+     * token
      */
     private String token;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
     @TableField(exist = false)
     private static final long serialVersionUID = 1L;
 }

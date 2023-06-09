@@ -18,7 +18,8 @@ public enum ResponseCode {
     EMAIL_ERROR(50003,"邮箱错误"),
     PASSWORD_NO_MATCH_ERROR(50004,"两次密码不一致"),
     USER_EXIST_ERROR(50005,"用户已存在"),
-    REGISTER_ERROR(50006,"注册失败");
+    PASSWORD_ERROR(50006,"密码错误"),
+    REGISTER_ERROR(50007,"注册失败");
 
     /**
      * 状态码
