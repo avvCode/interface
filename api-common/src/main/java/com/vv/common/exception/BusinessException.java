@@ -1,7 +1,7 @@
 package com.vv.common.exception;
 
 
-import com.vv.common.model.vo.ResponseCode;
+import com.vv.common.enums.ResponseCode;
 
 /**
  * 自定义异常类

@@ -1,6 +1,7 @@
 package com.vv.common.model.vo;
 
 
+import com.vv.common.enums.ResponseCode;
 import lombok.Data;
 
 @Data

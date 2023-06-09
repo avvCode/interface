@@ -4,7 +4,7 @@ package com.vv.api.handler;
 
 import com.vv.common.exception.BusinessException;
 import com.vv.common.model.vo.BaseResponse;
-import com.vv.common.model.vo.ResponseCode;
+import com.vv.common.enums.ResponseCode;
 import com.vv.common.model.vo.ResultUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.web.bind.annotation.ExceptionHandler;

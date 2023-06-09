@@ -7,11 +7,12 @@ import com.vv.api.model.dto.SafeUserDTO;
 import com.vv.api.service.UserService;
 import com.vv.common.exception.BusinessException;
 import com.vv.common.model.vo.BaseResponse;
-import com.vv.common.model.vo.ResponseCode;
+import com.vv.common.enums.ResponseCode;
 import com.vv.common.model.vo.ResultUtils;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 @RestController
@@ -25,7 +26,7 @@ public class UserController {
      * @return
      */
     @PostMapping("/loginByEmail")
-    public BaseResponse loginByEmail(@RequestBody LoginByEmailDTO loginByEmailDTO, HttpServletResponse response){
+    public BaseResponse loginByEmail(@RequestBody LoginByEmailDTO loginByEmailDTO,HttpServletResponse response){
         if(loginByEmailDTO == null){
             throw new BusinessException(ResponseCode.PARAMS_ERROR,"请求参数错误");
         }
@@ -37,7 +38,7 @@ public class UserController {
      * 用户通过手机+验证码登录
      */
     @PostMapping("/loginByPhone")
-    public BaseResponse loginByPhone(@RequestBody LoginByPhoneDTO loginByPhoneDTO, HttpServletResponse response){
+    public BaseResponse loginByPhone(@RequestBody LoginByPhoneDTO loginByPhoneDTO, HttpServletRequest request, HttpServletResponse response){
         if(loginByPhoneDTO == null){
             throw new BusinessException(ResponseCode.PARAMS_ERROR,"请求参数错误");
         }

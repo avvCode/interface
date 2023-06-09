@@ -8,6 +8,7 @@ import com.vv.api.model.dto.RegisterUserDTO;
 import com.vv.api.model.dto.SafeUserDTO;
 import com.vv.api.model.po.User;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
 /**
@@ -20,7 +21,7 @@ public interface UserService extends IService<User> {
 
     SafeUserDTO loginByEmail(LoginByEmailDTO loginByEmailDTO, HttpServletResponse response);
 
-    SafeUserDTO loginByPhone(LoginByPhoneDTO loginByPhoneDTO, HttpServletResponse response);
+    SafeUserDTO loginByPhone(LoginByPhoneDTO loginByPhoneDTO,  HttpServletResponse response);
 
     boolean loginSms(String phone);
 

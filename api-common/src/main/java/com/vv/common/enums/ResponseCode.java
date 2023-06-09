@@ -1,4 +1,4 @@
-package com.vv.common.model.vo;
+package com.vv.common.enums;
 
 /**
  * 错误码

@@ -1,5 +1,7 @@
 package com.vv.common.model.vo;
 
+import com.vv.common.enums.ResponseCode;
+
 /**
  * 返回工具类
  *
@@ -18,7 +20,7 @@ public class ResultUtils {
         return new BaseResponse<>(0, data, "ok");
     }
 
-    public static <T> BaseResponse <T> success(ResponseCode responseCode,String message){
+    public static <T> BaseResponse <T> success(ResponseCode responseCode, String message){
         return new BaseResponse<>(responseCode.getCode(),null,message);
     }
 

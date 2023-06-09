@@ -1,5 +1,7 @@
 package com.vv.api.service.impl;
 
+import cn.hutool.core.bean.BeanUtil;
+import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestAlgorithm;
 import cn.hutool.crypto.digest.Digester;
@@ -14,11 +16,10 @@ import com.vv.api.model.dto.SafeUserDTO;
 import com.vv.api.model.po.User;
 import com.vv.api.service.UserService;
 import com.vv.common.constant.CookieConstant;
-import com.vv.common.constant.RabbitmqConstant;
 import com.vv.common.constant.RedisConstant;
 import com.vv.common.exception.BusinessException;
 import com.vv.common.model.to.SmsTo;
-import com.vv.common.model.vo.ResponseCode;
+import com.vv.common.enums.ResponseCode;
 import com.vv.common.utils.AuthUtils;
 import com.vv.common.utils.CheckUtils;
 import com.vv.common.utils.TokenUtils;
@@ -28,8 +29,12 @@ import org.springframework.data.redis.core.RedisTemplate;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
+import java.util.HashMap;
+import java.util.Map;
+import java.util.concurrent.TimeUnit;
 
 /**
 * @author vv
@@ -156,7 +161,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public SafeUserDTO loginByEmail(LoginByEmailDTO loginByEmailDTO, HttpServletResponse response) {
+    public SafeUserDTO loginByEmail(LoginByEmailDTO loginByEmailDTO,  HttpServletResponse response) {
         String email = loginByEmailDTO.getUserEmail();
         if(!CheckUtils.isEmail(email)){
             throw new BusinessException(ResponseCode.EMAIL_ERROR);
@@ -200,7 +205,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     }
 
     @Override
-    public SafeUserDTO loginByPhone(LoginByPhoneDTO loginByPhoneDTO, HttpServletResponse response) {
+    public SafeUserDTO loginByPhone(LoginByPhoneDTO loginByPhoneDTO,  HttpServletResponse response) {
         String phone = loginByPhoneDTO.getUserPhone();
         //1.手机是否合法
         if (phone.length() < 8 || !CheckUtils.isPhoneNum(phone)) {
@@ -229,8 +234,18 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         String token = tokenUtils.getToken(user.getId(), user.getUserEmail());
         safeUserDTO.setToken(token);
 
-        //TODO 将Token存入到Redis中
-//        redisTemplate.opsForValue().set();
+
+        String key = RedisConstant.TOKEN_PREFIX + token;
+
+        Map<String, Object> stringObjectMap = BeanUtil.beanToMap(safeUserDTO,
+                new HashMap<>(), CopyOptions.create()
+                        .setIgnoreNullValue(true)
+                        .setFieldValueEditor(
+                                (fieldName,fieldValue)->fieldValue.toString()
+                        ));
+
+        redisTemplate.opsForValue().set(key,stringObjectMap);
+        redisTemplate.expire(key,RedisConstant.TOKEN_TTL, TimeUnit.MINUTES);
 
         Cookie cookie = new Cookie(CookieConstant.HEAD_AUTHORIZATION,token);
         cookie.setPath("/");
