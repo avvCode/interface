@@ -1,24 +1,17 @@
-package com.vv.api.model.dto;
+package com.vv.api.model.vo;
 
-import com.baomidou.mybatisplus.annotation.TableField;
 import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import java.io.Serializable;
-import java.util.Date;
-
-/**
- * 脱敏后的用户
- */
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
-public class SafeUserDTO implements Serializable {
+public class UserVo {
     /**
      * 主键-用户id
      */
-    private Long id;
+    private Integer id;
 
     /**
      * 性别 男/女
@@ -44,19 +37,10 @@ public class SafeUserDTO implements Serializable {
      * 用户角色 user / admin
      */
     private String userRole;
-    /**
-     * token
-     */
-    private String token;
-    /**
-     * 创建时间
-     */
-    private Date createTime;
 
     /**
-     * 更新时间
+     * 登录凭证
      */
-    private Date updateTime;
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+    private String token;
+
 }

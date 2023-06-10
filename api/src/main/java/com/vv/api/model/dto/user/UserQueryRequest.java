@@ -1,14 +1,18 @@
-package com.vv.api.model.vo;
+package com.vv.api.model.dto.user;
 
-import com.baomidou.mybatisplus.annotation.TableField;
+import com.vv.common.model.PageRequest;
+import com.vv.common.model.vo.IdRequest;
 import lombok.AllArgsConstructor;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 
+import java.io.Serializable;
+import java.util.Date;
+
+@EqualsAndHashCode(callSuper = true)
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
-public class LoginUserVo {
+public class UserQueryRequest extends PageRequest implements Serializable {
     /**
      * 主键-用户id
      */
@@ -38,12 +42,17 @@ public class LoginUserVo {
      * 用户角色 user / admin
      */
     private String userRole;
-
     /**
-     * 登录凭证
+     * token
      */
     private String token;
+    /**
+     * 创建时间
+     */
+    private Date createTime;
 
-    @TableField(exist = false)
-    private static final long serialVersionUID = 1L;
+    /**
+     * 更新时间
+     */
+    private Date updateTime;
 }

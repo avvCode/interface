@@ -1,12 +1,15 @@
 package com.vv.api.service;
 
 
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.service.IService;
 import com.vv.api.model.dto.LoginByEmailDTO;
 import com.vv.api.model.dto.LoginByPhoneDTO;
 import com.vv.api.model.dto.RegisterUserDTO;
 import com.vv.api.model.dto.SafeUserDTO;
+import com.vv.api.model.dto.user.UserQueryRequest;
 import com.vv.api.model.po.User;
+import com.vv.api.model.vo.UserVo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -21,9 +24,11 @@ public interface UserService extends IService<User> {
 
     SafeUserDTO loginByEmail(LoginByEmailDTO loginByEmailDTO, HttpServletResponse response);
 
-    SafeUserDTO loginByPhone(LoginByPhoneDTO loginByPhoneDTO,  HttpServletResponse response);
+    SafeUserDTO loginByPhone(LoginByPhoneDTO loginByPhoneDTO, HttpServletResponse response);
 
     boolean loginSms(String phone);
 
+    Page<UserVo> listUserByPage(UserQueryRequest queryRequest);
 
+    SafeUserDTO getLoginUser(HttpServletResponse response);
 }

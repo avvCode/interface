@@ -6,6 +6,8 @@ import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestAlgorithm;
 import cn.hutool.crypto.digest.Digester;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
+import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.vv.api.common.RabbitmqUtils;
 import com.vv.api.mapper.UserMapper;
@@ -13,13 +15,16 @@ import com.vv.api.model.dto.LoginByEmailDTO;
 import com.vv.api.model.dto.LoginByPhoneDTO;
 import com.vv.api.model.dto.RegisterUserDTO;
 import com.vv.api.model.dto.SafeUserDTO;
+import com.vv.api.model.dto.user.UserQueryRequest;
 import com.vv.api.model.po.User;
+import com.vv.api.model.vo.UserVo;
 import com.vv.api.service.UserService;
 import com.vv.common.constant.CookieConstant;
 import com.vv.common.constant.RedisConstant;
 import com.vv.common.exception.BusinessException;
 import com.vv.common.model.to.SmsTo;
 import com.vv.common.enums.ResponseCode;
+import com.vv.common.model.vo.BaseResponse;
 import com.vv.common.utils.AuthUtils;
 import com.vv.common.utils.CheckUtils;
 import com.vv.common.utils.TokenUtils;
@@ -33,8 +38,10 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 import java.util.Map;
 import java.util.concurrent.TimeUnit;
+import java.util.stream.Collectors;
 
 /**
 * @author vv
@@ -194,7 +201,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         safeUserDTO.setToken(token);
 
         //TODO 将Token存入到Redis中
-//        redisTemplate.opsForValue().set();
+        redisTemplate.opsForValue().set(RedisConstant.TOKEN_PREFIX+token,safeUserDTO);
 
         Cookie cookie = new Cookie(CookieConstant.HEAD_AUTHORIZATION,token);
         cookie.setPath("/");
@@ -254,7 +261,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
 
         return safeUserDTO;
     }
+    /**
+     * 分页获取用户列表
+     * @param userQueryRequest
+     * @return
+     */
+    @Override
+    public Page<UserVo> listUserByPage(UserQueryRequest userQueryRequest) {
+        long current = 1;
+        long size = 10;
+        User userQuery = new User();
 
+        if (userQueryRequest != null) {
+            BeanUtils.copyProperties(userQueryRequest, userQuery);
+            current = userQueryRequest.getCurrent();
+            size = userQueryRequest.getPageSize();
+        }
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>(userQuery);
+        Page<User> userPage = this.page(new Page<>(current, size), queryWrapper);
+        Page<UserVo> userVoPage = new PageDTO<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
+
+        List<UserVo> userVoList = userPage.getRecords().stream().map(user -> {
+            UserVo userVo = new UserVo();
+            BeanUtils.copyProperties(user, userVo);
+            return userVo;
+        }).collect(Collectors.toList());
+
+        userVoPage.setRecords(userVoList);
+
+        return userVoPage;
+    }
+
+    @Override
+    public SafeUserDTO getLoginUser(HttpServletResponse response) {
+        return null;
+    }
 }
 
 

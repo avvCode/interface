@@ -20,7 +20,7 @@ class UserServiceImplTest {
     @Test
     public void testToken(){
         String userAccount = "123456";
-        int userId = 1;
+        Long userId = 1L;
         String token = tokenUtils.getToken(userId, userAccount);
         System.out.println("token = " + token);
         boolean b = tokenUtils.verifyToken(token);

@@ -25,7 +25,7 @@ public class TokenUtils {
      */
     private final JWTSigner signer = JWTSignerUtil.hs512(SALT.getBytes());
 
-    public  String getToken(int userId,String userEmail){
+    public  String getToken(Long userId,String userEmail){
         DateTime now = DateTime.now();
         DateTime newTime = now.offsetNew(DateField.HOUR, 720); //过期时间720小时
         Map<String, Object> map = new HashMap<String, Object>() {

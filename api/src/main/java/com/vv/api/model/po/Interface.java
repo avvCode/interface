@@ -19,7 +19,7 @@ public class Interface implements Serializable {
      * 主键-接口id
      */
     @TableId(type = IdType.AUTO)
-    private Integer id;
+    private Long id;
 
     /**
      * 接口名称
@@ -69,7 +69,7 @@ public class Interface implements Serializable {
     /**
      * 接口发布者
      */
-    private Integer userId;
+    private Long userId;
 
     /**
      * 接口库存
