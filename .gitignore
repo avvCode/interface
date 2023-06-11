@@ -39,3 +39,4 @@ build/
 /api-support/src/main/resources/application.yml
 /.idea/
 /.idea/
+/api/src/main/resources/application.yml

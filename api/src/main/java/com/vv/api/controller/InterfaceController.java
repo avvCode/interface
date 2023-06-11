@@ -112,7 +112,7 @@ public class InterfaceController {
     }
 
     @GetMapping("/offline")
-    public BaseResponse offlineInterface( @RequestParam Long id){
+    public BaseResponse offlineInterface(@RequestParam Long id){
         if(id == null){
             throw new BusinessException(ResponseCode.PARAMS_ERROR);
         }
@@ -122,5 +122,4 @@ public class InterfaceController {
         }
         return ResultUtils.success(ResponseCode.SUCCESS);
     }
-
 }
