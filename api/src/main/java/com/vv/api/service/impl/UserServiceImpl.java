@@ -1,10 +1,6 @@
 package com.vv.api.service.impl;
 
-import cn.hutool.core.bean.BeanUtil;
-import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.RandomUtil;
-import cn.hutool.crypto.digest.DigestAlgorithm;
-import cn.hutool.crypto.digest.Digester;
 import cn.hutool.jwt.JWT;
 import cn.hutool.jwt.JWTUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
@@ -19,38 +15,27 @@ import com.vv.api.model.dto.RegisterUserDTO;
 import com.vv.api.model.dto.SafeUserDTO;
 import com.vv.api.model.dto.user.UserQueryRequest;
 import com.vv.api.model.po.User;
-import com.vv.api.model.vo.UserVo;
 import com.vv.api.service.UserService;
-import com.vv.common.constant.CookieConstant;
 import com.vv.common.constant.RedisConstant;
-import com.vv.common.constant.TokenConstant;
 import com.vv.common.exception.BusinessException;
 import com.vv.common.model.to.SmsTo;
 import com.vv.common.enums.ResponseCode;
-import com.vv.common.model.vo.BaseResponse;
 import com.vv.common.utils.AuthUtils;
 import com.vv.common.utils.CheckUtils;
 import com.vv.common.utils.TokenUtils;
-import net.sf.jsqlparser.statement.select.KSQLWindow;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
-import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
-import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
-import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
-import java.security.Security;
 import java.util.Date;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
@@ -121,7 +106,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     public long userRegister(RegisterUserDTO registerUserDTO) {
         String phone = registerUserDTO.getUserPhone();
         //1.手机是否合法
-        if (phone.length() < 8 || !CheckUtils.isPhoneNum(phone)) {
+        if (phone == null || phone.length() < 8 || !CheckUtils.isPhoneNum(phone)) {
             throw new BusinessException(ResponseCode.SMS_CODE_ERROR,"手机非法");
         }
         //2.邮箱格式是否正确
@@ -189,10 +174,6 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
             throw new BusinessException(ResponseCode.EMAIL_ERROR);
         }
         String password = loginByEmailDTO.getPassword();
-        String confirmPassword = loginByEmailDTO.getConfirmPassword();
-        if(!(password != null && password.equals(confirmPassword))){
-            throw new BusinessException(ResponseCode.PASSWORD_NO_MATCH_ERROR);
-        }
 
         User user = ((User) loadUserByUsername(email));
         if(user == null){
@@ -246,7 +227,7 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
      * @return
      */
     @Override
-    public Page<UserVo> listUserByPage(UserQueryRequest userQueryRequest) {
+    public Page<SafeUserDTO> listUserByPage(UserQueryRequest userQueryRequest) {
         long current = 1;
         long size = 10;
         User userQuery = new User();
@@ -258,10 +239,10 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         }
         QueryWrapper<User> queryWrapper = new QueryWrapper<>(userQuery);
         Page<User> userPage = this.page(new Page<>(current, size), queryWrapper);
-        Page<UserVo> userVoPage = new PageDTO<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
+        Page<SafeUserDTO> userVoPage = new PageDTO<>(userPage.getCurrent(), userPage.getSize(), userPage.getTotal());
 
-        List<UserVo> userVoList = userPage.getRecords().stream().map(user -> {
-            UserVo userVo = new UserVo();
+        List<SafeUserDTO> userVoList = userPage.getRecords().stream().map(user -> {
+            SafeUserDTO userVo = new SafeUserDTO();
             BeanUtils.copyProperties(user, userVo);
             return userVo;
         }).collect(Collectors.toList());

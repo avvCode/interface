@@ -10,6 +10,7 @@ import com.vv.common.exception.BusinessException;
 import com.vv.common.model.vo.BaseResponse;
 import com.vv.common.enums.ResponseCode;
 import com.vv.common.model.vo.ResultUtils;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.*;
 
 import javax.annotation.Resource;

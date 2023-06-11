@@ -16,6 +16,30 @@ import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
  */
 @Configuration
 public class SecurityConfig extends WebSecurityConfigurerAdapter {
+    private final String[] pathPatterns = {
+            "/user/oauth2/**",
+            "/user/register",
+            "/user/registerSms",
+            "/user/login",
+            "/user/loginByEmail",
+            "/user/loginSms",
+            "/user/loginBySms",
+            "/user/logout",
+    };
+    private final String [] adminPath = {
+            "/user/list/page",
+            "/user/list",
+            "/userInterface/add",
+            "/userInterface/delete",
+            "/userInterface/update",
+            "/userInterface/get",
+            "/userInterface/list",
+            "/userInterface/list/page",
+            "/interface/list",
+            "/interface/list/AllPage",
+            "/interface/offline",
+            "/interface/online"
+    };
 
     @Autowired
     private SimpleAccessDeniedHandler simpleAccessDeniedHandler;
@@ -42,19 +66,9 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
                 .csrf().disable()
                 .authorizeRequests()
                 // 管理员才可访问的接口
-                .antMatchers().hasRole("admin")
+                .antMatchers(adminPath).hasRole("admin")
                 // 对于登录接口 允许匿名访问.anonymous()，即未登陆时可以访问，登陆后携带了token就不能再访问了
-                .antMatchers(
-                        "/user/loginByPhone",
-                        "/user/loginByEmail",
-                        "/user/register",
-                        "/user/registerSms"
-                ).anonymous()
-
-                .antMatchers(
-                        "/user/checkUserLogin",
-                        "/user/loginSms")
-                .permitAll()
+                .antMatchers(pathPatterns).anonymous()
                 // 除上面外的所有请求全部需要鉴权认证,.authenticated()表示认证之后可以访问
                 .anyRequest()
                 .authenticated();
@@ -66,10 +80,8 @@ public class SecurityConfig extends WebSecurityConfigurerAdapter {
 
         //开启配置注销登录功能
         http.logout()
-                .logoutUrl("/user/logout");//指定用户注销登录时请求访问的地址
-                //.deleteCookies(CookieConstant.headAuthorization)//指定用户注销登录后删除的 Cookie。
-                //.deleteCookies(CookieConstant.autoLoginAuthCheck)
-                //.logoutSuccessUrl("http://122.9.148.119:88/api/user/logoutSuccess");//指定退出登录后跳转的地址
+                .logoutUrl("/user/logout")//指定用户注销登录时请求访问的地址
+                .logoutSuccessUrl("http://122.9.148.119:88/api/user/logoutSuccess");//指定退出登录后跳转的地址
         //每个浏览器最多同时只能登录1个用户
         http.sessionManagement()
                 .maximumSessions(1)

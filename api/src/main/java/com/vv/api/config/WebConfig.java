@@ -3,8 +3,12 @@ package com.vv.api.config;
 import com.vv.api.interceptor.LoginInterceptor;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.CorsRegistry;
 import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
 import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+import java.util.Arrays;
+import java.util.List;
 
 /**
  * @author vv
@@ -13,13 +17,44 @@ import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
  */
 @Configuration
 public class WebConfig implements WebMvcConfigurer {
+    /**
+     * 放行接口
+     */
+    private final List<String> pathPatterns = Arrays.asList(
+            "/user/register",
+            "/user/registerSms",
+            "/user/loginByPhone",
+            "/user/loginSms",
+            "/user/loginByEmail",
+            "/user/logout"
+    );
 
+    /**
+     * 放行静态资源
+     */
+    private final List<String> staticPath = Arrays.asList();
     @Autowired
     private LoginInterceptor loginInterceptor;
 
 
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
-        registry.addInterceptor(loginInterceptor);
+        registry.addInterceptor(loginInterceptor)
+                .excludePathPatterns(pathPatterns);
+    }
+
+    @Override
+    public void addCorsMappings(CorsRegistry registry) {
+        registry.addMapping("/**")
+                // 是否发送Cookie
+                .allowCredentials(true)
+                // 放行哪些原始域
+                .allowedOrigins("http://localhost:8000")
+                // 放行哪些请求方式
+                .allowedMethods("GET", "POST", "PUT", "DELETE")
+                // 放行哪些原始请求头部信息
+                .allowedHeaders("*")
+                // 暴露哪些头部信息
+                .exposedHeaders("*");
     }
 }

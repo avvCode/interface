@@ -12,5 +12,4 @@ import java.io.Serializable;
 public class LoginByEmailDTO implements Serializable {
     private String userEmail;
     private String password;
-    private String confirmPassword;
 }

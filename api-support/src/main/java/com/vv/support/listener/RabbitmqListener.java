@@ -14,6 +14,7 @@ import org.springframework.amqp.core.Message;
 import com.rabbitmq.client.Channel;
 
 import java.io.IOException;
+import java.util.concurrent.TimeUnit;
 
 @Slf4j
 @Component
@@ -34,8 +35,10 @@ public class RabbitmqListener {
         try {
             //手动确认消息
             //塞到Redis里
-            redisTemplate.opsForValue().set(RedisConstant.REGISTER_CODE_PREFIX+phone,code);
-
+            String key = RedisConstant.REGISTER_CODE_PREFIX+phone;
+            redisTemplate.opsForValue().set(key,code);
+            //设置过期时间
+            redisTemplate.expire(key,RedisConstant.LOGIN_CODE_TTL, TimeUnit.SECONDS);
             //手动确认消息
             channel.basicAck(message.getMessageProperties().getDeliveryTag(),false);
         } catch (IOException e) {

@@ -9,7 +9,6 @@ import com.vv.api.model.dto.RegisterUserDTO;
 import com.vv.api.model.dto.SafeUserDTO;
 import com.vv.api.model.dto.user.UserQueryRequest;
 import com.vv.api.model.po.User;
-import com.vv.api.model.vo.UserVo;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -30,6 +29,6 @@ public interface UserService extends IService<User> {
 
     boolean loginSms(String phone);
 
-    Page<UserVo> listUserByPage(UserQueryRequest queryRequest);
+    Page<SafeUserDTO> listUserByPage(UserQueryRequest queryRequest);
 
 }

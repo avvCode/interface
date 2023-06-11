@@ -45,4 +45,7 @@ class UserServiceImplTest {
         registerUserDTO.setSmsCode("01884");
         long l = userService.userRegister(registerUserDTO);
     }
+    @Test
+    public void testLogin(){
+    }
 }
