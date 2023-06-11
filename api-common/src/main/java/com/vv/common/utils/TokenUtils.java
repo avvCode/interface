@@ -16,14 +16,14 @@ import java.util.Map;
 @Component
 public class TokenUtils {
     /**
-     * 加盐
+     * 项目签名
      */
-    private final String SALT = "API.VV.TOKEN";
+    private final String signName = "API.VV.TOKEN";
 
     /**
      * 签名
      */
-    private final JWTSigner signer = JWTSignerUtil.hs512(SALT.getBytes());
+    private final JWTSigner signer = JWTSignerUtil.hs512(signName.getBytes());
 
     public  String getToken(Long userId,String userEmail){
         DateTime now = DateTime.now();
@@ -43,7 +43,7 @@ public class TokenUtils {
     }
 
     /**
-     * 验证Token是否过期
+     * 验证Token是否合法
      * @param token
      * @return
      */

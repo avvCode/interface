@@ -5,6 +5,7 @@ import com.vv.api.model.dto.LoginByPhoneDTO;
 import com.vv.api.model.dto.RegisterUserDTO;
 import com.vv.api.model.dto.SafeUserDTO;
 import com.vv.api.service.UserService;
+import com.vv.common.constant.RedisConstant;
 import com.vv.common.exception.BusinessException;
 import com.vv.common.model.vo.BaseResponse;
 import com.vv.common.enums.ResponseCode;
@@ -20,7 +21,6 @@ import javax.servlet.http.HttpServletResponse;
 public class UserController {
     @Resource
     private UserService userService;
-
     /**
      * 用户通过账号密码登录
      * @return
@@ -87,6 +87,23 @@ public class UserController {
             return ResultUtils.error(ResponseCode.SYSTEM_ERROR);
         }
         return ResultUtils.success(ResponseCode.SUCCESS,"发送成功");
+    }
+
+    /**
+     * 注销
+     * @param id
+     * @return
+     */
+    @GetMapping("/logout")
+    public BaseResponse logout(HttpServletRequest request){
+        if(request == null){
+            throw new BusinessException(ResponseCode.PARAMS_ERROR,"请求参数错误");
+        }
+        boolean b = userService.logout(request);
+        if(!b){
+            return ResultUtils.error(ResponseCode.SYSTEM_ERROR);
+        }
+        return ResultUtils.success(ResponseCode.SUCCESS,"退出成功");
     }
 
 }

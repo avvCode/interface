@@ -26,9 +26,10 @@ public interface UserService extends IService<User> {
 
     SafeUserDTO loginByPhone(LoginByPhoneDTO loginByPhoneDTO, HttpServletResponse response);
 
+    boolean logout(HttpServletRequest request);
+
     boolean loginSms(String phone);
 
     Page<UserVo> listUserByPage(UserQueryRequest queryRequest);
 
-    SafeUserDTO getLoginUser(HttpServletResponse response);
 }

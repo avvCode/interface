@@ -5,6 +5,8 @@ import cn.hutool.core.bean.copier.CopyOptions;
 import cn.hutool.core.util.RandomUtil;
 import cn.hutool.crypto.digest.DigestAlgorithm;
 import cn.hutool.crypto.digest.Digester;
+import cn.hutool.jwt.JWT;
+import cn.hutool.jwt.JWTUtil;
 import com.baomidou.mybatisplus.core.conditions.query.QueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
@@ -21,6 +23,7 @@ import com.vv.api.model.vo.UserVo;
 import com.vv.api.service.UserService;
 import com.vv.common.constant.CookieConstant;
 import com.vv.common.constant.RedisConstant;
+import com.vv.common.constant.TokenConstant;
 import com.vv.common.exception.BusinessException;
 import com.vv.common.model.to.SmsTo;
 import com.vv.common.enums.ResponseCode;
@@ -28,14 +31,22 @@ import com.vv.common.model.vo.BaseResponse;
 import com.vv.common.utils.AuthUtils;
 import com.vv.common.utils.CheckUtils;
 import com.vv.common.utils.TokenUtils;
+import net.sf.jsqlparser.statement.select.KSQLWindow;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.redis.core.RedisTemplate;
+import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.UserDetailsService;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 import org.springframework.stereotype.Service;
 
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.security.Security;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -47,7 +58,7 @@ import java.util.stream.Collectors;
 * @author vv
 */
 @Service
-public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService {
+public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService, UserDetailsService {
 
     @Autowired
     private RedisTemplate redisTemplate;
@@ -61,7 +72,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Autowired
     private RabbitmqUtils rabbitmqUtils;
 
-    private final String PREFIX_USER = "api:user:";
+    @Autowired
+    private BCryptPasswordEncoder passwordEncoder;
+
+
+
     /**
      * 发一条短信到手机，并且将验证码放到redis中
      * @param phone
@@ -82,6 +97,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return true;
     }
 
+    /**
+     * 发一条短信到手机，并且将验证码放到redis中
+     * @param phone
+     * @return
+     */
     @Override
     public boolean loginSms(String phone) {
         //先看看你这个b是不是已经发过短信了
@@ -125,46 +145,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //成功，从redis中移除这个验证码
         redisTemplate.delete(RedisConstant.REGISTER_CODE_PREFIX + phone);
 
-        //5.是否已经注册
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userPhone",phone);
-        long count = baseMapper.selectCount(queryWrapper);
-        if(count > 0){
-            throw new BusinessException(ResponseCode.USER_EXIST_ERROR,"用户已存在");
+        synchronized (phone.intern()){
+            //5.是否已经注册
+            QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+            queryWrapper.eq("userPhone",phone);
+            long count = baseMapper.selectCount(queryWrapper);
+            if(count > 0){
+                throw new BusinessException(ResponseCode.USER_EXIST_ERROR,"用户已存在");
+            }
+
+            //6.注册成功
+            User user = new User();
+            //对密码进行加密
+            String encodePassword = passwordEncoder.encode(registerUserDTO.getPassword());
+            user.setUserEmail(email);
+            user.setUserPhone(phone);
+            user.setPassword(encodePassword);
+            //生成accessKey
+            String accessKey = authUtils.accessKey(phone);
+            user.setAccessKey(accessKey);
+            //生成secretKey
+            String secretKey = authUtils.secretKey(phone, user.getUserEmail());
+            user.setSecretKey(secretKey);
+            //生成Token
+            String token = authUtils.token(phone, user.getUserEmail(), accessKey,secretKey);
+
+            user.setToken(token);
+
+            user.setCreateTime(new Date());
+            user.setUpdateTime(new Date());
+
+            //插入数据库
+            save(user);
+
+            return user.getId();
         }
-
-        //6.注册成功
-        User user = new User();
-
-        //对密码进行md5加密
-        Digester md5 = new Digester(DigestAlgorithm.MD5);
-
-        String passwordMd5 = md5.digestHex(registerUserDTO.getPassword());
-
-        user.setUserEmail(email);
-
-        user.setUserPhone(phone);
-
-        user.setPassword(passwordMd5);
-
-        //生成accessKey
-        String accessKey = authUtils.accessKey(phone);
-        user.setAccessKey(accessKey);
-        //生成secretKey
-        String secretKey = authUtils.secretKey(phone, user.getUserEmail());
-        user.setSecretKey(secretKey);
-        //生成Token
-        String token = authUtils.token(phone, user.getUserEmail(), accessKey,secretKey);
-
-        user.setToken(token);
-
-        user.setCreateTime(new Date());
-        user.setUpdateTime(new Date());
-
-        //插入数据库
-        this.save(user);
-
-        return user.getId();
     }
 
     @Override
@@ -178,37 +193,17 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         if(!(password != null && password.equals(confirmPassword))){
             throw new BusinessException(ResponseCode.PASSWORD_NO_MATCH_ERROR);
         }
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userEmail",email);
-        User user = baseMapper.selectOne(queryWrapper);
+
+        User user = ((User) loadUserByUsername(email));
         if(user == null){
-            throw new BusinessException(ResponseCode.NOT_FOUND_ERROR,"用户不存在");
+            throw new BusinessException(ResponseCode.EMAIL_ERROR);
         }
         //对密码加密后进行匹配
-        //对密码进行md5加密
-        Digester md5 = new Digester(DigestAlgorithm.MD5);
-
-        String passwordMd5 = md5.digestHex(loginByEmailDTO.getPassword());
-
-        if(!user.getPassword().equals(passwordMd5)){
+        boolean isMatches = passwordEncoder.matches(loginByEmailDTO.getPassword(), user.getPassword());
+        if(!isMatches){
             throw new BusinessException(ResponseCode.PASSWORD_ERROR);
         }
-        SafeUserDTO safeUserDTO = new SafeUserDTO();
-
-        BeanUtils.copyProperties(user,safeUserDTO);
-
-        String token = tokenUtils.getToken(user.getId(), user.getUserEmail());
-        safeUserDTO.setToken(token);
-
-        //TODO 将Token存入到Redis中
-        redisTemplate.opsForValue().set(RedisConstant.TOKEN_PREFIX+token,safeUserDTO);
-
-        Cookie cookie = new Cookie(CookieConstant.HEAD_AUTHORIZATION,token);
-        cookie.setPath("/");
-        cookie.setMaxAge(CookieConstant.EXPIRE_TIME);
-        response.addCookie(cookie);
-
-        return safeUserDTO;
+        return initLoginUser(user,response);
     }
 
     @Override
@@ -227,40 +222,24 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         //成功，从redis中移除这个验证码
         redisTemplate.delete(RedisConstant.REGISTER_CODE_PREFIX + phone);
         //5.是否已经注册
-        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
-        queryWrapper.eq("userPhone",phone);
-        User user = baseMapper.selectOne(queryWrapper);
-        if(user ==  null){
-            throw new BusinessException(ResponseCode.USER_EXIST_ERROR,"用户不存在");
+        User user = ((User) loadUserByUsername(phone));
+        if(user == null){
+            throw new BusinessException(ResponseCode.NOT_FOUND_ERROR,"用户未注册");
         }
 
-        SafeUserDTO safeUserDTO = new SafeUserDTO();
-
-        BeanUtils.copyProperties(user,safeUserDTO);
-
-        String token = tokenUtils.getToken(user.getId(), user.getUserEmail());
-        safeUserDTO.setToken(token);
-
-
-        String key = RedisConstant.TOKEN_PREFIX + token;
-
-        Map<String, Object> stringObjectMap = BeanUtil.beanToMap(safeUserDTO,
-                new HashMap<>(), CopyOptions.create()
-                        .setIgnoreNullValue(true)
-                        .setFieldValueEditor(
-                                (fieldName,fieldValue)->fieldValue.toString()
-                        ));
-
-        redisTemplate.opsForValue().set(key,stringObjectMap);
-        redisTemplate.expire(key,RedisConstant.TOKEN_TTL, TimeUnit.MINUTES);
-
-        Cookie cookie = new Cookie(CookieConstant.HEAD_AUTHORIZATION,token);
-        cookie.setPath("/");
-        cookie.setMaxAge(CookieConstant.EXPIRE_TIME);
-        response.addCookie(cookie);
-
-        return safeUserDTO;
+        return initLoginUser(user,response);
     }
+
+    @Override
+    public boolean logout(HttpServletRequest request) {
+        String token = request.getHeader("token");
+        JWT jwt = JWTUtil.parseToken(token);
+        String id = (String) jwt.getPayload("userId");
+        //去掉redis中的用户信息
+        redisTemplate.delete(RedisConstant.USER_INFO_PREFIX+id);
+        return true;
+    }
+
     /**
      * 分页获取用户列表
      * @param userQueryRequest
@@ -292,10 +271,41 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
         return userVoPage;
     }
 
+
+    /**
+     * 根据 手机或者邮箱 获取用户
+     * @param s
+     * @return
+     * @throws UsernameNotFoundException
+     */
     @Override
-    public SafeUserDTO getLoginUser(HttpServletResponse response) {
-        return null;
+    public UserDetails loadUserByUsername(String s) throws UsernameNotFoundException {
+
+        QueryWrapper<User> queryWrapper = new QueryWrapper<>();
+        queryWrapper.eq("userPhone",s).or().eq("userEmail",s);
+        User user = getOne(queryWrapper);
+        if(user == null){
+            throw new RuntimeException("用户不存在");
+        }
+        return user;
     }
+
+    public SafeUserDTO initLoginUser(User user , HttpServletResponse response){
+        SafeUserDTO safeUserDTO = new SafeUserDTO();
+        BeanUtils.copyProperties(user,safeUserDTO);
+        String token = tokenUtils.getToken(user.getId(), user.getUserEmail());
+        safeUserDTO.setToken(token);
+        //将Token存入到请求头中
+        response.setHeader("token",token);
+        String key = RedisConstant.USER_INFO_PREFIX + user.getId();
+        //将用户信息存放到Redis中
+        redisTemplate.opsForValue().set(key,safeUserDTO);
+        //设置用户过期时间
+        redisTemplate.expire(key,RedisConstant.USER_INFO_TTL, TimeUnit.SECONDS);
+        //返回脱敏用户
+        return safeUserDTO;
+    }
+
 }
 
 

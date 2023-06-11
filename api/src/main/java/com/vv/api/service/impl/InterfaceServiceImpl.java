@@ -8,8 +8,8 @@ import com.vv.api.model.dto.interfaceinfo.InterfaceQueryRequest;
 import com.vv.api.model.po.Interface;
 import com.vv.api.model.vo.InterfaceVo;
 import com.vv.api.service.InterfaceService;
-import com.vv.common.constant.CookieConstant;
 import com.vv.common.constant.RedisConstant;
+import com.vv.common.constant.TokenConstant;
 import com.vv.common.enums.InterfaceEnum;
 import com.vv.common.enums.ResponseCode;
 import com.vv.common.exception.BusinessException;
@@ -33,7 +33,7 @@ public class InterfaceServiceImpl extends ServiceImpl<InterfaceMapper, Interface
     @Override
     public boolean addInterface(InterfaceVo interfaceVo, HttpServletRequest request) {
         //获取用户id
-        String token = request.getHeader(CookieConstant.HEAD_AUTHORIZATION);
+        String token = request.getHeader(TokenConstant.HEAD_AUTHORIZATION);
         if(token == null){
             return false;
         }
@@ -54,7 +54,7 @@ public class InterfaceServiceImpl extends ServiceImpl<InterfaceMapper, Interface
     @Override
     public boolean updateInterface(InterfaceVo interfaceVo, HttpServletRequest request) {
         //获取用户id
-        String token = request.getHeader(CookieConstant.HEAD_AUTHORIZATION);
+        String token = request.getHeader(TokenConstant.HEAD_AUTHORIZATION);
         if(token == null){
             return false;
         }
