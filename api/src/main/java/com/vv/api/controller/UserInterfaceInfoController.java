@@ -6,4 +6,7 @@ import org.springframework.web.bind.annotation.RestController;
 @RestController
 @RequestMapping("/user_interface")
 public class UserInterfaceInfoController {
+    //TODO 查询用户已购买的接口
+
+
 }

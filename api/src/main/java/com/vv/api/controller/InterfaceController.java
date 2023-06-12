@@ -21,7 +21,6 @@ public class InterfaceController {
 
 
     //新增
-    //TODO 权限管理
     @PostMapping("/addInterface")
     public BaseResponse addInterface(@RequestBody InterfaceVo interfaceVo, HttpServletRequest request){
         if(interfaceVo == null){
@@ -35,7 +34,6 @@ public class InterfaceController {
     }
 
     //修改
-    //TODO 权限管理
     @PostMapping("/updateInterface")
     public BaseResponse updateInterface(@RequestBody InterfaceVo interfaceVo, HttpServletRequest request){
         if(interfaceVo == null){
@@ -48,7 +46,6 @@ public class InterfaceController {
         return ResultUtils.success(ResponseCode.SUCCESS);
     }
     //删除
-    //TODO 权限管理
     @GetMapping("/deleteInterface")
     public BaseResponse deleteInterface(@RequestParam long id){
         if(id <= 0){

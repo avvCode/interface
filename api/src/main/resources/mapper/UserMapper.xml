@@ -5,7 +5,6 @@
 
     <resultMap id="BaseResultMap" type="com.vv.api.model.po.User">
             <id property="id" column="id" jdbcType="INTEGER"/>
-
             <result property="password" column="password" jdbcType="VARCHAR"/>
             <result property="userSex" column="userSex" jdbcType="CHAR"/>
             <result property="userAvatar" column="userAvatar" jdbcType="VARCHAR"/>
