@@ -32,7 +32,16 @@ public class WebConfig implements WebMvcConfigurer {
     /**
      * 放行静态资源
      */
-    private final List<String> staticPath = Arrays.asList();
+    private final List<String> staticPath = Arrays.asList(
+            "/swagger-ui.html",
+            "/swagger-ui/*",
+            "/swagger-resources/**",
+            "/v2/api-docs",
+            "/v3/api-docs",
+            "/webjars/**",
+            "/doc.html"
+    );
+
     @Autowired
     private LoginInterceptor loginInterceptor;
 
@@ -40,7 +49,8 @@ public class WebConfig implements WebMvcConfigurer {
     @Override
     public void addInterceptors(InterceptorRegistry registry) {
         registry.addInterceptor(loginInterceptor)
-                .excludePathPatterns(pathPatterns);
+                .excludePathPatterns(pathPatterns)
+                .excludePathPatterns(staticPath);
     }
 
     @Override

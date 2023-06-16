@@ -26,6 +26,7 @@ public class RabbitmqUtils implements RabbitTemplate.ConfirmCallback, RabbitTemp
         /**
          * 参数：
          * 1、交换机名称
+         *
          * 2、routingKey
          * 3、消息内容
          */
