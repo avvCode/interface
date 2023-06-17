@@ -2,6 +2,7 @@ package com.vv.api.controller;
 
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.vv.api.model.dto.interfaceinfo.InterfaceQueryRequest;
+import com.vv.api.model.vo.InterfaceForUser;
 import com.vv.api.model.vo.InterfaceVo;
 import com.vv.api.service.InterfaceService;
 import com.vv.common.enums.ResponseCode;
@@ -77,9 +78,9 @@ public class InterfaceController {
      * @return
      */
     @GetMapping("/list/page")
-    public BaseResponse<Page<InterfaceVo>> listInterfaceInfoByPage(InterfaceQueryRequest interfaceInfoQueryRequest) {
+    public BaseResponse<Page<InterfaceForUser>> listInterfaceInfoByPage(InterfaceQueryRequest interfaceInfoQueryRequest) {
 
-        Page<InterfaceVo> onlineInterfaceByPage = interfaceService.getOnlineInterfaceByPage(interfaceInfoQueryRequest);
+        Page<InterfaceForUser> onlineInterfaceByPage = interfaceService.getOnlineInterfaceByPage(interfaceInfoQueryRequest);
         return ResultUtils.success(onlineInterfaceByPage);
     }
 

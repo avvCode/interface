@@ -8,6 +8,7 @@ import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
 import com.baomidou.mybatisplus.extension.plugins.pagination.PageDTO;
 import com.baomidou.mybatisplus.extension.service.impl.ServiceImpl;
 import com.vv.api.common.RabbitmqUtils;
+import com.vv.api.common.RedisTokenBucket;
 import com.vv.api.mapper.UserMapper;
 import com.vv.api.model.dto.LoginByEmailDTO;
 import com.vv.api.model.dto.LoginByPhoneDTO;
@@ -46,6 +47,9 @@ import java.util.stream.Collectors;
 public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements UserService, UserDetailsService {
 
     @Autowired
+    private RedisTokenBucket redisTokenBucket;
+
+    @Autowired
     private RedisTemplate redisTemplate;
 
     @Autowired
@@ -70,8 +74,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public boolean registerSms(String phone) {
         //先看看你这个b是不是已经发过短信了
-        String code = (String) redisTemplate.opsForValue().get(RedisConstant.REGISTER_CODE_PREFIX+phone);
-        if(code != null){
+//        String code = (String) redisTemplate.opsForValue().get(RedisConstant.REGISTER_CODE_PREFIX+phone);
+//        if(code != null){
+//            return false;
+//        }
+        if(!redisTokenBucket.tryAcquire(phone)){
             return false;
         }
         //生成验证码
@@ -90,8 +97,11 @@ public class UserServiceImpl extends ServiceImpl<UserMapper, User> implements Us
     @Override
     public boolean loginSms(String phone) {
         //先看看你这个b是不是已经发过短信了
-        String code = (String) redisTemplate.opsForValue().get(RedisConstant.LOGIN_CODE_PREFIX+phone);
-        if(code != null){
+//        String code = (String) redisTemplate.opsForValue().get(RedisConstant.LOGIN_CODE_PREFIX+phone);
+//        if(code != null){
+//            return false;
+//        }
+        if(!redisTokenBucket.tryAcquire(phone)){
             return false;
         }
         //生成验证码
