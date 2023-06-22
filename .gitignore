@@ -40,3 +40,4 @@ build/
 /.idea/
 /.idea/
 /api/src/main/resources/application.yml
+/api-order/src/main/resources/application.yml
